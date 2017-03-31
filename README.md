@@ -26,6 +26,16 @@ On ArchLinux, install dependencies by: `sudo pacman -S gcc sed cmake make libjpe
 
 On Ubuntu, install dependencies by: `sudo apt install build-essential sed cmake libjpeg-dev libeigen3-dev`
 
+### Set up your Docker container:
+To build your docker image run the following command from the same directory as the Dockerfile:
+```
+$ docker build -t open_pano .
+```
+This will build the image and tag it with the name ```open_pano```. Next you can run your image. In the following command replace ```<path_to_shared_directory>``` with the absolute path to the directory you want to share between your workspace and the virtual machine created by Docker.
+```
+$ docker run -it --name cmsc421_projs -v <path_to_shared_directory>:/shared_folder \open_pano /bin/bash
+```
+When you run your docker image you'll be dropped right into a bash terminal. From there you can compile and run OpenPano. Images added to ```shared_folder``` will be accesible from both the vm and your workspace.
 ### Compile:
 #### Linux / OSX / WSL (bash on windows)
 ```
