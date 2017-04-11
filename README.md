@@ -27,7 +27,7 @@ On ArchLinux, install dependencies by: `sudo pacman -S gcc sed cmake make libjpe
 On Ubuntu, install dependencies by: `sudo apt install build-essential sed cmake libjpeg-dev libeigen3-dev`
 
 ### Set up a Docker container (optional):
-If you're having trouble gettin OpenPano to run natively, then you may find it easier to run inside of a virtual machine. Docker makes it easy to set up a light weight virtual machine or 'container'.
+If you're having trouble getting OpenPano to run natively, then you may find it easier to run inside of a virtual machine. Docker makes it easy to set up a light weight virtual machine or 'container'.
 
 The settings for you Docker container are described in the Dockerfile, which is just a file named 'Dockerfile' in the root directory of the project.
 
@@ -37,9 +37,16 @@ $ docker build -t open_pano .
 ```
 This will build the image and tag it with the name ```open_pano```. Next you can run your image. In the following command replace ```<path_to_shared_directory>``` with the absolute path to the directory you want to share between your workspace and the virtual machine created by Docker.
 ```
-$ docker run -it --name cmsc421_projs -v <path_to_shared_directory>:/shared_folder \open_pano /bin/bash
+$ docker run -it --name open_pano -v <path_to_shared_directory>:/shared_folder \open_pano /bin/bash
 ```
 When you run your docker image you'll be dropped right into a bash terminal. From there you can compile and run OpenPano. Images added to ```shared_folder``` will be accesible from both the vm and your workspace.
+
+To exit from the docker container use the command `exit`. This will stop the container.
+
+You can start the container again using the command `~$ docker start open_pano`. Then attach to the container to `~$ docker attach open_pano`.
+
+Get a list of all docker images: `~$ docker images`.
+See all running containers: `~$ docker ps.`
 ### Compile:
 #### Linux / OSX / WSL (bash on windows)
 ```
