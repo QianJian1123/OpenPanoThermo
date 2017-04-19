@@ -43,7 +43,7 @@ When you run your docker image you'll be dropped right into a bash terminal. Fro
 
 To exit from the docker container use the command `exit`. This will stop the container.
 
-You can start the container again using the command `~$ docker start open_pano`. Then attach to the container to `~$ docker attach open_pano`.
+You can start the container again using the command `~$ docker start open_pano`. Then attach to the container to `~$ docker attach open_pano`. (Then hit [Enter]).
 
 Get a list of all docker images: `~$ docker images`.
 See all running containers: `~$ docker ps.`
