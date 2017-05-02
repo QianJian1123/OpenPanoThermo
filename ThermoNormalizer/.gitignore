@@ -1,0 +1,8 @@
+*swp
+.DS_Store
+*jpg
+*png
+*json
+HornbakeDeployment2/
+outputs/
+OUTPUTS/
