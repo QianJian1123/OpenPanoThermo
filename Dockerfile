@@ -9,5 +9,5 @@ RUN apt-get update -y && \
 
 RUN apt-get update
 RUN apt-get -y install git
-RUN git clone https://github.com/AntCas/OpenPano.git OpenPano
+RUN git clone https://github.com/AntCas/OpenPanoThermo.git OpenPano
 RUN apt -y install build-essential sed cmake libjpeg-dev libeigen3-dev
