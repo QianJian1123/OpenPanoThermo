@@ -1,3 +1,4 @@
+*.swp
 Eigen/
 obj
 main
@@ -31,3 +32,4 @@ Debug
 cmake_install.cmake
 src/cmake_install.cmake
 .vs/
+.DS_Store
