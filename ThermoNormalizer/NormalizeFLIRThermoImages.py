@@ -159,10 +159,10 @@ def get_temperature_range(exifDataAll):
 
 # Calculates metadata used by the extract_raw_data(...) function
 # Depends on the values it extracts from meta being the same accross all images
-def calc_extract_raw_data_meta_info(meta):
+def calc_extract_raw_data_meta_info(meta, normalize):
     global Max, Min, R1, R2, B, O, F, Smax, Smin, Sdelta
     # Set max and min temperature of the image for coloring
-    if args.normalize: # remove False to restore this option
+    if normalize: 
         Max, Min = TEMP_RANGE
     else:
         Max = float(meta['RawValueMedian'])+float(meta['RawValueRange'])/2
@@ -264,7 +264,7 @@ def cleanup_files(name):
         
     return 0
 
-def process_files(relevant_path):
+def process_files(relevant_path, normalize=True):
     included_extenstions = ['jpg', 'JPG']
     file_names = [fn for fn in os.listdir(relevant_path)
                   if any(fn.endswith(ext) for ext in included_extenstions)]
@@ -279,14 +279,14 @@ def process_files(relevant_path):
 
     # Calculate temperature range if we're normalizing
     global TEMP_RANGE
-    if args.normalize:
+    if normalize:
         TEMP_RANGE = get_temperature_range(exifDataAll)
 
     print TEMP_RANGE
 
     # Calculate some metadata we'll need to extract the thermo data into an png file
     # This will create several global values and depends on the camera settings not changing between images
-    calc_extract_raw_data_meta_info(exifDataAll.values()[0])
+    calc_extract_raw_data_meta_info(exifDataAll.values()[0], normalize)
 
     # Used for timing the functions below
     t1t, t2t, t3t, t4t, t5t = 0, 0, 0, 0, 0
@@ -339,5 +339,5 @@ if __name__ == "__main__":
 
     # Get Files In Directory
     relevant_path = args.path
-    process_files(relevant_path)
+    process_files(relevant_path, args.normalize)
 
