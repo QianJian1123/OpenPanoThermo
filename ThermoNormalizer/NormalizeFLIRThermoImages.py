@@ -261,10 +261,16 @@ def cleanup_files(name):
         check_call(str(cm+' '+name+'_ir2.png'), shell=True)
     if os.path.isfile(str(name+'_gradient.png')):
         check_call(str(cm+' '+name+'_gradient.png'), shell=True)
+    if os.path.isfile(str(name+'_final_without_scale.png')):
+        check_call(str(cm+' '+name+'_final_without_scale.png'), shell=True)
         
     return 0
 
 def process_files(relevant_path, normalize=True):
+    if not relevant_path.endswith('/'):
+        relevant_path += '/'
+
+    print relevant_path
     included_extenstions = ['jpg', 'JPG']
     file_names = [fn for fn in os.listdir(relevant_path)
                   if any(fn.endswith(ext) for ext in included_extenstions)]
