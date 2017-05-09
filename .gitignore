@@ -1,3 +1,4 @@
+src/image-stitching
 *.swp
 Eigen/
 obj
