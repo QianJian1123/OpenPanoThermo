@@ -6,7 +6,6 @@ RUN apt-get update -y && \
     python-dev \
     python-pip \
     wget \
-    pip \
     git && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
