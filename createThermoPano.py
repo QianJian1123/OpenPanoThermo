@@ -11,8 +11,10 @@ from subprocess import check_call
 import ThermoNormalizer.NormalizeFLIRThermoImages as normalize
 
 def run():
-    print args
     normalize.process_files(args.path)
+    check_call('mkdir thermo_images_temp_file', shell=True)
+    check_call('mv *png thermo_images_temp_file', shell=True)
+    
 
 if __name__ == "__main__":
     # parse command line arguments
