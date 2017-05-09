@@ -1,13 +1,34 @@
 FROM ubuntu:latest
 
+# install package managers
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     python-dev \
     python-pip \
-    wget && \
+    wget \
+    pip \
+    git && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-RUN apt-get update
-RUN apt-get -y install git
-RUN git clone https://github.com/AntCas/OpenPanoThermo.git OpenPano
-RUN apt -y install build-essential sed cmake libjpeg-dev libeigen3-dev
+# download the OpenPanoThermo project from GitHub
+RUN git clone https://github.com/AntCas/OpenPanoThermo.git OpenPanoThermo
+
+# install dependencies for OpenPano
+RUN apt-get update -y && \
+    apt-get install -y \
+    build-essential \
+    sed \
+    cmake \
+    libjpeg-dev \
+    libeigen3-dev
+
+# install dependencies for ThermoNormalizer
+RUN apt-get update -y && \
+    apt-get install -y \
+    exiftool \
+    imagemagick
+
+# install required python modules for ThermoNormalizer
+RUN pip install \
+    setup-tools \
+    pillow
