@@ -14,6 +14,15 @@ def run():
     normalize.process_files(args.path)
     check_call('mkdir thermo_images_temp_file', shell=True)
     check_call('mv *png thermo_images_temp_file', shell=True)
+    check_call('cd src && make', shell=True)
+    check_call('cd src && ./image-stitching ../thermo_images_temp_file/*', shell=True)
+
+    # remove temporary files unless otherwise specified
+    if not args.keep:
+        check_call('rm ./thermo_images_temp_file/*', shell=True)
+        check_call('rmdir thermo_images_temp_file', shell=True)
+
+    check_call('mv ./src/out.jpg ' + args.output, shell=True)
     
 
 if __name__ == "__main__":
