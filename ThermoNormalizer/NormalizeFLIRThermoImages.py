@@ -40,8 +40,8 @@ import time # for performance profiling
 
 
 #ImageMagick 7 uses alpha-color; older uses mattecolor"
-#alpha_color = "mattecolor"
-alpha_color = "alpha-color"
+alpha_color = "mattecolor" # They changed it back to mattecolor
+#alpha_color = "alpha-color"
 VERSION = 2     # increment this if the files created change
 Android = True
 
