@@ -28,6 +28,7 @@ RUN apt-get update -y && \
     imagemagick
 
 # install required python modules for ThermoNormalizer
+RUN pip install --upgrade pip
 RUN pip install \
     setuptools \
     pillow
