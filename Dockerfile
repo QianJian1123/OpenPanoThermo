@@ -29,5 +29,5 @@ RUN apt-get update -y && \
 
 # install required python modules for ThermoNormalizer
 RUN pip install \
-    setup-tools \
+    setuptools \
     pillow
