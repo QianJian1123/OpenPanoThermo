@@ -35,18 +35,41 @@ To build a docker image run the following command from the same directory as the
 ```
 $ docker build -t open_pano .
 ```
-This will build the image and tag it with the name ```open_pano```. Next you can run your image. In the following command replace ```<path_to_shared_directory>``` with the absolute path to the directory you want to share between your workspace and the virtual machine created by Docker.
+This will take awhile to run, so give it some time.
+
+This will build the image and tag it with the name ```open_pano```. Next you can run your image. 
+
+In the following command replace ```<path_to_shared_directory>``` with the absolute path to the directory you want to share between your workspace and the virtual machine created by Docker.
 ```
 $ docker run -it --name open_pano -v <path_to_shared_directory>:/shared_folder \open_pano /bin/bash
 ```
+
+For example, if you want to make your Desktop accesible from the container, use the following:
+```
+$ docker run -it --name open_pano -v ~/Desktop:/Desktop \open_pano /bin/bash
+```
+
 When you run your docker image you'll be dropped right into a bash terminal. From there you can compile and run OpenPano. Images added to ```shared_folder``` will be accesible from both the vm and your workspace.
 
 To exit from the docker container use the command `exit`. This will stop the container.
 
-You can start the container again using the command `~$ docker start open_pano`. Then attach to the container to `~$ docker attach open_pano`. (Then hit [Enter]).
+You can start the container again using the command `~$ docker start open_pano`.
 
+Then attach to the container with `~$ docker attach open_pano`. (Then hit [Enter]).
+
+Some other commands that might be helpful:
 Get a list of all docker images: `~$ docker images`.
 See all running containers: `~$ docker ps.`
+
+At that point you should be all set as the Dockerfile will have installed everything else you need including downloading this repository into your workspace.
+
+Now you can run the entire OpenPanoThermo pipeline.
+
+```
+$ cd OpenPanoThermo
+$ python createThermoPano.py -o /path/to/output.jpg /path/to/input/images
+```
+
 ### Compile:
 #### Linux / OSX / WSL (bash on windows)
 ```
