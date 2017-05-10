@@ -21,8 +21,15 @@ RUN apt-get update -y && \
     libjpeg-dev \
     libeigen3-dev
 
+# compile OpenPano
+RUN cd OpenPanoThermo/src && make
+
 # install dependencies for ThermoNormalizer
 RUN apt-get update -y && \
     apt-get install -y \
     exiftool \
     imagemagick
+
+# install required python modules
+RUN pip install setuptools \
+    pillow
