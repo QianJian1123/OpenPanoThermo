@@ -26,9 +26,3 @@ RUN apt-get update -y && \
     apt-get install -y \
     exiftool \
     imagemagick
-
-# install required python modules for ThermoNormalizer
-RUN pip install --upgrade pip
-RUN pip install \
-    setuptools \
-    pillow
