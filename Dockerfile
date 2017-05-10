@@ -29,7 +29,3 @@ RUN apt-get update -y && \
     apt-get install -y \
     exiftool \
     imagemagick
-
-# install required python modules
-RUN pip install setuptools \
-    pillow

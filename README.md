@@ -61,6 +61,11 @@ Some other commands that might be helpful:
 Get a list of all docker images: `~$ docker images`.
 See all running containers: `~$ docker ps.`
 
+Once the docker image is running you'll need to install the necessary python packages (pillow and imagemagick)
+```
+$ pip install setuptools
+$ pip install pillow
+```
 At that point you should be all set as the Dockerfile will have installed everything else you need including downloading this repository into your workspace.
 
 Now you can run the entire OpenPanoThermo pipeline.
