@@ -27,6 +27,8 @@ On ArchLinux, install dependencies by: `sudo pacman -S gcc sed cmake make libjpe
 On Ubuntu, install dependencies by: `sudo apt install build-essential sed cmake libjpeg-dev libeigen3-dev`
 
 ### Set up a Docker container (optional):
+https://www.useloom.com/share/031fd2a41acc4de69922a3e076ef0f94
+
 If you're having trouble getting OpenPano to run natively, then you may find it easier to run inside of a virtual machine. Docker makes it easy to set up a light weight virtual machine or 'container'.
 
 The settings for you Docker container are described in the Dockerfile, which is just a file named 'Dockerfile' in the root directory of the project.
