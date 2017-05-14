@@ -37,9 +37,6 @@ import os.path
 import os
 import argparse
 
-import time  # for performance profiling
-
-
 # ImageMagick 7 uses alpha-color; older uses mattecolor"
 alpha_color = "mattecolor"  # They changed it back to mattecolor
 #alpha_color = "alpha-color"
@@ -349,9 +346,6 @@ def process_files(relevant_path, normalize=True):
     # settings not changing between images
     calc_extract_raw_data_meta_info(exifDataAll.values()[0], normalize)
 
-    # Used for timing the functions below
-    t1t, t2t, t3t, t4t, t5t = 0, 0, 0, 0, 0
-
     for file in file_names:
         imgFile = relevant_path + file
         imgName = imgFile.split(relevant_path)[1].split('.')[0]
@@ -360,37 +354,14 @@ def process_files(relevant_path, normalize=True):
         if os.path.isfile(imgFile):
             print('Processing: ' + imgFile)
             exifData = exifDataAll[imgFile]
-
-            t1s = time.time()
+                                                                  # runtime
             create_palette_file(pal, imgFile, imgName, exifData)  # 6.63s, 0.42s
-            t1e = time.time()
-            t1t += t1e - t1s
-
-            t2s = time.time()
             extract_raw_data(imgFile, imgName, exifData, Android)  # 15.39s, 1.15s
-            t2e = time.time()
-            t2t += t2e - t2s
-
-            t3s = time.time()
             extract_embedded_file(imgFile, imgName, Android)  # 7.03s, 0.62s
-            t3e = time.time()
-            t3t += t3e - t3s
-
-            t4s = time.time()
             create_final_output(imgName, pal, exifData)  # 17.07s, 1.27s
-            t4e = time.time()
-            t4t += t4e - t4s
-
-            t5s = time.time()
             cleanup_files(imgName)  # .76s, 0.05s
-            t5e = time.time()
-            t5t += t5e - t5s
-            print "t1b:", t1e - t1s, "t2b:", t2e - t2s, "t3b:", t3e - t3s, "t4b:", t4e - t4s, "t5b:", t5e - t5s
         else:
             print('File [' + imgFile + '] Not Found!')
-
-    print "t1t:", t1t, "t2t:", t2t, "t3t:", t3t, "t4t:", t4t, "t5t:", t5t
-
 
 if __name__ == "__main__":
     # parse command line arguments (e.g. file path)
