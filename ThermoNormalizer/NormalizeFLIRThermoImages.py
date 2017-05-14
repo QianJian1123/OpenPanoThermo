@@ -147,20 +147,24 @@ def create_palette_file(pal, file, name, meta):
     Cmin = convert_pixel(Min, meta)
 
     # Create Palette
-    check_call('exiftool ' + file + ' -b -Palette | convert -size "' + meta['PaletteColors']
-               + 'X1" -depth 8 YCbCr:- -separate -swap 1,2 -set colorspace YCbCr -combine -colorspace sRGB -auto-level ' + pal, shell=True)
+    check_call('exiftool ' + file + ' -b -Palette | convert -size "' + 
+               meta['PaletteColors'] +
+               'X1" -depth 8 YCbCr:- -separate -swap 1,2 -set colorspace YCbCr -combine -colorspace sRGB -auto-level ' + pal, shell=True)
 
     # Color Scale
-    check_call('convert -size 16x430 gradient: ' + pal + ' -clut -' + alpha_color + ' ' + font_color
-               + ' -frame 1x1 -set colorspace rgb -' + alpha_color + ' gray -frame 1x1 "' + name + '_gradient.png"', shell=True);
-    check_call('convert ' + name + '_gradient.png -background ' + frame_color + ' ' + font + ' -fill ' + font_color
-               + ' -pointsize 15 label:\"' + str(Cmax) + ' C\" +swap -gravity Center -append  label:\"' + str(Cmin) + ' C\" -append ' + name + '_gradient.png', shell=True)
+    check_call('convert -size 16x430 gradient: ' + pal + ' -clut -' +
+               alpha_color + ' ' + font_color +
+               ' -frame 1x1 -set colorspace rgb -' + alpha_color +
+               ' gray -frame 1x1 "' + name + '_gradient.png"', shell=True);
+    check_call('convert ' + name + '_gradient.png -background ' + frame_color +
+               ' ' + font + ' -fill ' + font_color
+               + ' -pointsize 15 label:\"' + str(Cmax) +
+               ' C\" +swap -gravity Center -append  label:\"' + str(Cmin) +
+               ' C\" -append ' + name + '_gradient.png', shell=True)
     return 0
 
 # Gets range of temperatures accross all thermo images, depends on
 # existence of json files
-
-
 def get_temperature_range(exifDataAll):
     # find the temperature range accross all images
     max_temp, min_temp = None, None
@@ -176,8 +180,6 @@ def get_temperature_range(exifDataAll):
 
 # Calculates metadata used by the extract_raw_data(...) function
 # Depends on the values it extracts from meta being the same accross all images
-
-
 def calc_extract_raw_data_meta_info(meta, normalize):
     global Max, Min, R1, R2, B, O, F, Smax, Smin, Sdelta
     # Set max and min temperature of the image for coloring
@@ -198,32 +200,25 @@ def calc_extract_raw_data_meta_info(meta, normalize):
     Sdelta = Smax - Smin
 
 # Extract raw thermo data into a thermo png file
-
-
 def extract_raw_data(file, outName, meta, no_endian):
     # 16 bit PNG (Get Raw Thermal Values)
     resize = "-resize 200%"
     size = str(meta['RawThermalImageWidth']) + "x" + \
         str(meta['RawThermalImageHeight'])
     if no_endian:
-        check_call(str('exiftool -b -RawThermalImage ' +
-                       file +
+        check_call(str('exiftool -b -RawThermalImage ' + file +
                        ' | convert - gray:- | convert -depth 16 -size ' +
-                       size +
-                       '  gray:- ' +
-                       outName +
-                       '_raw.png'), shell=True)
+                       size + '  gray:- ' + outName + '_raw.png'), shell=True)
     else:
-        check_call(str('exiftool -b -RawThermalImage ' +
-                       file +
+        check_call(str('exiftool -b -RawThermalImage ' + file +
                        ' | convert - gray:- | convert -depth 16 -endian msb -size ' +
-                       size +
-                       '  gray:- ' +
-                       outName +
-                       '_raw.png'), shell=True)
+                       size + ' gray:- ' + outName + '_raw.png'), shell=True)
 
-    check_call('convert ' + outName + '_raw.png -fx \"(' + str(B) + '/ln(' + str(R1) + '/(' + str(R2) + '*((65535*u+' + str(O) + ')?(65535*u+' + str(O) + '):1))+'
-               + str(F) + ')-' + str(Smin) + ')/' + str(Sdelta) + '\" ' + outName + '_ir.png', shell=True)
+    check_call('convert ' + outName + '_raw.png -fx \"(' + str(B) +
+               '/ln(' + str(R1) + '/(' + str(R2) + '*((65535*u+' + 
+               str(O) + ')?(65535*u+' + str(O) + '):1))+' + str(F) +
+               ')-' + str(Smin) + ')/' + str(Sdelta) + '\" ' +
+                outName + '_ir.png', shell=True)
 
     return 0
 
@@ -233,21 +228,12 @@ def extract_raw_data(file, outName, meta, no_endian):
 def extract_embedded_file(file, outName, dat):
     # Get Embedded Image
     if dat:
-        check_call(
-            'exiftool ' +
-            file +
-            ' -embeddedimage -b | convert -size 480x640 -depth 8 ycbcr:- ' +
-            outName +
-            '_embedded.png',
-            shell=True)
+        check_call( 'exiftool ' + file +
+                    ' -embeddedimage -b | convert -size 480x640 -depth 8 ycbcr:- ' +
+                    outName + '_embedded.png', shell=True)
     else:
-        check_call(
-            'exiftool -b -EmbeddedImage ' +
-            file +
-            ' > ' +
-            outName +
-            '_embedded.png',
-            shell=True)
+        check_call('exiftool -b -EmbeddedImage ' + file +
+                   ' > ' + outName + '_embedded.png', shell=True)
     return 0
 
 
@@ -265,70 +251,48 @@ def create_final_output(name, pal, meta):
     cropy = resizepercent * int(meta['RawThermalImageHeight']) / 100
 
     # TODO: Update for posix
-    check_call("convert " + name + "_embedded.png -gravity center -crop " + str(cropx) + "x" + str(cropy) + geometrie
-               + " -colorspace gray -sharpen 0x3 -level 30%,70%! " \
-               # TODO: This is the line that gives us the MSX definition, but it's not outputting correctly (possibly due to ImageMagick Change)
-               #+" ( -clone 0 -blur 0x3 ) -compose mathematics -define compose:args=0,-1,+1,0.5 -composite -colorspace gray -sharpen 0x3 -level 30%,70%! " \
+    check_call("convert " + name + "_embedded.png -gravity center -crop " +
+               str(cropx) + "x" + str(cropy) + geometrie +
+               " -colorspace gray -sharpen 0x3 -level 30%,70%! " \
                + name + "_embedded1.png", shell=True)
 
     # Emboss image (not sure if this produces the right style of image)
-    check_call("convert " + name + "_embedded.png -gravity center -crop " + str(cropx) + "x" + str(cropy) + geometrie
-               + " -auto-level -shade 45x30 -auto-level "
-               + name + "_embedded1.png", shell=True)
+    check_call("convert " + name + "_embedded.png -gravity center -crop " +
+               str(cropx) + "x" + str(cropy) + geometrie +
+               " -auto-level -shade 45x30 -auto-level " +
+               name + "_embedded1.png", shell=True)
+
     gama = float(
-        subprocess.check_output(
-            "convert " +
-            name +
-            "_embedded1.png -format \"%[fx:mean]\" info:",
-            shell=True))
+           subprocess.check_output("convert " + name +
+                                   "_embedded1.png -format \"%[fx:mean]\" info:",
+                                   shell=True))
+
     gama = math.log(gama) / math.log(0.5)
-    check_call(
-        "convert " +
-        name +
-        "_embedded1.png -gamma " +
-        str(gama) +
-        " " +
-        name +
-        "_embedded1.png",
-        shell=True)
+
+    check_call("convert " + name + "_embedded1.png -gamma " + str(gama) + " " +
+               name + "_embedded1.png", shell=True)
 
     # Create PIP
     # TODO: This mostly works but the thermal blending has been an issue, but
     # I don't think it will impact any of our current work.
-    check_call(
-        "convert " +
-        name +
-        "_ir.png " +
-        resize +
-        " " +
-        pal +
-        " -clut " +
-        name +
-        "_embedded1.png +swap -compose overlay -composite " +
-        name +
-        "_ir2.png",
-        shell=True)
+    check_call("convert " + name + "_ir.png " + resize + " " + pal + " -clut " +
+               name + "_embedded1.png +swap -compose overlay -composite " +
+               name + "_ir2.png", shell=True)
 
     # Recreate Original Image Cleaned up
     # If the above worked better, this would cropped/resize the IR image to
     # match and make one with a scale (but again, not necessary for projects)
-    check_call("convert " + name + "_embedded.png " + name + "_ir2.png -gravity Center -geometry " + geometrie + " -compose over -composite -background " + frame_color
-               + " -flatten " + name + "_final_without_scale.png", shell=True)
-    check_call(
-        "convert " +
-        name +
-        "_final_without_scale.png -gravity Center -crop " +
-        str(cropx) +
-        "x" +
-        str(cropy) +
-        geometrie +
-        " " +
-        name +
-        "_final_cropped.png",
-        shell=True)
+    check_call("convert " + name + "_embedded.png " + name +
+               "_ir2.png -gravity Center -geometry " + geometrie +
+               " -compose over -composite -background " + frame_color +
+               " -flatten " + name + "_final_without_scale.png", shell=True)
+
+    check_call("convert " + name +
+               "_final_without_scale.png -gravity Center -crop " +
+                str(cropx) + "x" + str(cropy) + geometrie + " " +
+                name + "_final_cropped.png", shell=True)
 
     return 0
-
 
 def cleanup_files(name):
     # cleanup
@@ -380,7 +344,7 @@ def process_files(relevant_path, normalize=True):
 
     print TEMP_RANGE
 
-    # Calculate some metadata we'll need to extract the thermo data into an png file
+    # Calculate some metadata needed to extract thermo data into a png file
     # This will create several global values and depends on the camera
     # settings not changing between images
     calc_extract_raw_data_meta_info(exifDataAll.values()[0], normalize)
@@ -398,17 +362,12 @@ def process_files(relevant_path, normalize=True):
             exifData = exifDataAll[imgFile]
 
             t1s = time.time()
-            create_palette_file(
-                pal, imgFile, imgName, exifData)  # 6.63s, 0.42s
+            create_palette_file(pal, imgFile, imgName, exifData)  # 6.63s, 0.42s
             t1e = time.time()
             t1t += t1e - t1s
 
             t2s = time.time()
-            extract_raw_data(
-                imgFile,
-                imgName,
-                exifData,
-                Android)  # 15.39s, 1.15s
+            extract_raw_data(imgFile, imgName, exifData, Android)  # 15.39s, 1.15s
             t2e = time.time()
             t2t += t2e - t2s
 
