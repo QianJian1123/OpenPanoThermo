@@ -128,7 +128,7 @@ def print_exifData(meta):
     return 0
 
 
-def create_palette_file(pal, file, name, meta):
+def create_palette_file(pal, file, name, meta, output_path):
     # Variables
     font_color = 'white'
     frame_color = 'black'
@@ -152,12 +152,12 @@ def create_palette_file(pal, file, name, meta):
     check_call('convert -size 16x430 gradient: ' + pal + ' -clut -' +
                alpha_color + ' ' + font_color +
                ' -frame 1x1 -set colorspace rgb -' + alpha_color +
-               ' gray -frame 1x1 "' + name + '_gradient.png"', shell=True);
-    check_call('convert ' + name + '_gradient.png -background ' + frame_color +
+               ' gray -frame 1x1 "' + output_path + name + '_gradient.png"', shell=True);
+    check_call('convert ' + output_path + name + '_gradient.png -background ' + frame_color +
                ' ' + font + ' -fill ' + font_color
                + ' -pointsize 15 label:\"' + str(Cmax) +
                ' C\" +swap -gravity Center -append  label:\"' + str(Cmin) +
-               ' C\" -append ' + name + '_gradient.png', shell=True)
+               ' C\" -append ' + output_path + name + '_gradient.png', shell=True)
     return 0
 
 # Gets range of temperatures accross all thermo images, depends on
@@ -197,7 +197,7 @@ def calc_extract_raw_data_meta_info(meta, normalize):
     Sdelta = Smax - Smin
 
 # Extract raw thermo data into a thermo png file
-def extract_raw_data(file, outName, meta, no_endian):
+def extract_raw_data(file, outName, meta, no_endian, output_path):
     # 16 bit PNG (Get Raw Thermal Values)
     resize = "-resize 200%"
     size = str(meta['RawThermalImageWidth']) + "x" + \
@@ -205,36 +205,36 @@ def extract_raw_data(file, outName, meta, no_endian):
     if no_endian:
         check_call(str('exiftool -b -RawThermalImage ' + file +
                        ' | convert - gray:- | convert -depth 16 -size ' +
-                       size + '  gray:- ' + outName + '_raw.png'), shell=True)
+                       size + '  gray:- ' + output_path + outName + '_raw.png'), shell=True)
     else:
         check_call(str('exiftool -b -RawThermalImage ' + file +
                        ' | convert - gray:- | convert -depth 16 -endian msb -size ' +
-                       size + ' gray:- ' + outName + '_raw.png'), shell=True)
+                       size + ' gray:- ' + output_path + outName + '_raw.png'), shell=True)
 
-    check_call('convert ' + outName + '_raw.png -fx \"(' + str(B) +
+    check_call('convert ' + output_path + outName + '_raw.png -fx \"(' + str(B) +
                '/ln(' + str(R1) + '/(' + str(R2) + '*((65535*u+' + 
                str(O) + ')?(65535*u+' + str(O) + '):1))+' + str(F) +
                ')-' + str(Smin) + ')/' + str(Sdelta) + '\" ' +
-                outName + '_ir.png', shell=True)
+                output_path + outName + '_ir.png', shell=True)
 
     return 0
 
 # Extract the embedded rgb data from the FLIR thermo image to a png
 
 
-def extract_embedded_file(file, outName, dat):
+def extract_embedded_file(file, outName, dat, output_path):
     # Get Embedded Image
     if dat:
         check_call( 'exiftool ' + file +
                     ' -embeddedimage -b | convert -size 480x640 -depth 8 ycbcr:- ' +
-                    outName + '_embedded.png', shell=True)
+                    output_path + outName + '_embedded.png', shell=True)
     else:
         check_call('exiftool -b -EmbeddedImage ' + file +
-                   ' > ' + outName + '_embedded.png', shell=True)
+                   ' > ' + output_path + outName + '_embedded.png', shell=True)
     return 0
 
 
-def create_final_output(name, pal, meta):
+def create_final_output(name, pal, meta, output_path):
     frame_color = 'black'
     # Scaled IR Images
     resize = "-resize 200%"
@@ -248,76 +248,76 @@ def create_final_output(name, pal, meta):
     cropy = resizepercent * int(meta['RawThermalImageHeight']) / 100
 
     # TODO: Update for posix
-    check_call("convert " + name + "_embedded.png -gravity center -crop " +
+    check_call("convert " + output_path + name + "_embedded.png -gravity center -crop " +
                str(cropx) + "x" + str(cropy) + geometrie +
                " -colorspace gray -sharpen 0x3 -level 30%,70%! " \
-               + name + "_embedded1.png", shell=True)
+               + output_path + name + "_embedded1.png", shell=True)
 
     # Emboss image (not sure if this produces the right style of image)
-    check_call("convert " + name + "_embedded.png -gravity center -crop " +
+    check_call("convert " + output_path + name + "_embedded.png -gravity center -crop " +
                str(cropx) + "x" + str(cropy) + geometrie +
                " -auto-level -shade 45x30 -auto-level " +
-               name + "_embedded1.png", shell=True)
+               output_path + name + "_embedded1.png", shell=True)
 
     gama = float(
-           subprocess.check_output("convert " + name +
+           subprocess.check_output("convert " + output_path + name +
                                    "_embedded1.png -format \"%[fx:mean]\" info:",
                                    shell=True))
 
     gama = math.log(gama) / math.log(0.5)
 
-    check_call("convert " + name + "_embedded1.png -gamma " + str(gama) + " " +
-               name + "_embedded1.png", shell=True)
+    check_call("convert " + output_path + name + "_embedded1.png -gamma " + str(gama) + " " +
+               output_path + name + "_embedded1.png", shell=True)
 
     # Create PIP
     # TODO: This mostly works but the thermal blending has been an issue, but
     # I don't think it will impact any of our current work.
-    check_call("convert " + name + "_ir.png " + resize + " " + pal + " -clut " +
-               name + "_embedded1.png +swap -compose overlay -composite " +
-               name + "_ir2.png", shell=True)
+    check_call("convert " + output_path + name + "_ir.png " + resize + " " + pal + " -clut " +
+               output_path + name + "_embedded1.png +swap -compose overlay -composite " +
+               output_path + name + "_ir2.png", shell=True)
 
     # Recreate Original Image Cleaned up
     # If the above worked better, this would cropped/resize the IR image to
     # match and make one with a scale (but again, not necessary for projects)
-    check_call("convert " + name + "_embedded.png " + name +
+    check_call("convert " + output_path + name + "_embedded.png " + output_path + name +
                "_ir2.png -gravity Center -geometry " + geometrie +
                " -compose over -composite -background " + frame_color +
-               " -flatten " + name + "_final_without_scale.png", shell=True)
+               " -flatten " + output_path + name + "_final_without_scale.png", shell=True)
 
-    check_call("convert " + name +
+    check_call("convert " + output_path + name +
                "_final_without_scale.png -gravity Center -crop " +
                 str(cropx) + "x" + str(cropy) + geometrie + " " +
-                name + "_final_cropped.png", shell=True)
+                output_path + name + "_final_cropped.png", shell=True)
 
     return 0
 
-def cleanup_files(name):
+def cleanup_files(name, output_path):
     # cleanup
     cm = "del"
     if os.name == "posix":
         cm = "rm"
 
-    if os.path.isfile(str(name + '_raw.png')):
-        check_call(str(cm + ' ' + name + '_raw.png'), shell=True)
-    if os.path.isfile(str(name + '_palette.png')):
-        check_call(str(cm + ' ' + name + '_palette.png'), shell=True)
-    if os.path.isfile(str(name + '_embedded1.png')):
-        check_call(str(cm + ' ' + name + '_embedded1.png'), shell=True)
-    if os.path.isfile(str(name + '_embedded.png')):
-        check_call(str(cm + ' ' + name + '_embedded.png'), shell=True)
-    if os.path.isfile(str(name + '_ir.png')):
-        check_call(str(cm + ' ' + name + '_ir.png'), shell=True)
-    if os.path.isfile(str(name + '_ir2.png')):
-        check_call(str(cm + ' ' + name + '_ir2.png'), shell=True)
-    if os.path.isfile(str(name + '_gradient.png')):
-        check_call(str(cm + ' ' + name + '_gradient.png'), shell=True)
-    if os.path.isfile(str(name + '_final_without_scale.png')):
-        check_call(str(cm + ' ' + name + '_final_without_scale.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_raw.png')):
+        check_call(str(cm + ' ' + output_path + name + '_raw.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_palette.png')):
+        check_call(str(cm + ' ' + output_path + name + '_palette.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_embedded1.png')):
+        check_call(str(cm + ' ' + output_path + name + '_embedded1.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_embedded.png')):
+        check_call(str(cm + ' ' + output_path + name + '_embedded.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_ir.png')):
+        check_call(str(cm + ' ' + output_path + name + '_ir.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_ir2.png')):
+        check_call(str(cm + ' ' + output_path + name + '_ir2.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_gradient.png')):
+        check_call(str(cm + ' ' + output_path + name + '_gradient.png'), shell=True)
+    if os.path.isfile(str(output_path + name + '_final_without_scale.png')):
+        check_call(str(cm + ' ' + output_path + name + '_final_without_scale.png'), shell=True)
 
     return 0
 
 
-def process_files(relevant_path, normalize=True):
+def process_files(relevant_path, normalize=True, output_path='./'):
     if not relevant_path.endswith('/'):
         relevant_path += '/'
 
@@ -349,17 +349,17 @@ def process_files(relevant_path, normalize=True):
     for file in file_names:
         imgFile = relevant_path + file
         imgName = imgFile.split(relevant_path)[1].split('.')[0]
-        pal = imgName + '_palette.png'
+        pal = output_path + imgName + '_palette.png'
         # Process File
         if os.path.isfile(imgFile):
             print('Processing: ' + imgFile)
             exifData = exifDataAll[imgFile]
                                                                   # runtime
-            create_palette_file(pal, imgFile, imgName, exifData)  # 6.63s, 0.42s
-            extract_raw_data(imgFile, imgName, exifData, Android)  # 15.39s, 1.15s
-            extract_embedded_file(imgFile, imgName, Android)  # 7.03s, 0.62s
-            create_final_output(imgName, pal, exifData)  # 17.07s, 1.27s
-            cleanup_files(imgName)  # .76s, 0.05s
+            create_palette_file(pal, imgFile, imgName, exifData, output_path)  # 6.63s, 0.42s
+            extract_raw_data(imgFile, imgName, exifData, Android, output_path)  # 15.39s, 1.15s
+            extract_embedded_file(imgFile, imgName, Android, output_path)  # 7.03s, 0.62s
+            create_final_output(imgName, pal, exifData, output_path)  # 17.07s, 1.27s
+            cleanup_files(imgName, output_path)  # .76s, 0.05s
         else:
             print('File [' + imgFile + '] Not Found!')
 
@@ -368,9 +368,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='FLIR image normalizer and enhancer')
     parser.add_argument('path', default='.')
-    parser.add_argument('--normalize', '-n', action='store_true')
+    parser.add_argument('--normalize', '-n', action='store_true',
+                        help='if not set the images will not be normalized')
+    parser.add_argument('--output', '-o', default='./',
+                        help='path to output directoy')
     args = parser.parse_args()
 
     # Get Files In Directory
     relevant_path = args.path
-    process_files(relevant_path, args.normalize)
+    process_files(relevant_path, args.normalize, args.output)
