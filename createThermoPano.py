@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='thermographic panorama pipeline')
     parser.add_argument('path', default='.')
     parser.add_argument('--output', '-o', default='./out.jpg', help='output filepath')
-    parser.add_argument('--keep', '-k', action='store_false', help='keep hidden and temporary files')
+    parser.add_argument('--keep', '-k', action='store_true', help='keep hidden and temporary files')
     args = parser.parse_args()
 
     # run the scripts in the pipeline
