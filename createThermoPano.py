@@ -11,9 +11,8 @@ from subprocess import check_call
 import ThermoNormalizer.NormalizeFLIRThermoImages as normalize
 
 def run():
-    normalize.process_files(args.path)
     check_call('mkdir thermo_images_temp_file', shell=True)
-    check_call('mv *png thermo_images_temp_file', shell=True)
+    normalize.process_files(relevant_path=args.path, normalize=True, output_path='./thermo_images_temp_file')
     check_call('cd src && make', shell=True)
     check_call('cd src && ./image-stitching ../thermo_images_temp_file/*', shell=True)
 

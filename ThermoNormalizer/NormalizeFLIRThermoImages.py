@@ -235,6 +235,7 @@ def extract_embedded_file(file, outName, dat, output_path):
 
 
 def create_final_output(name, pal, meta, output_path):
+    print "op", output_path, name
     frame_color = 'black'
     # Scaled IR Images
     resize = "-resize 200%"
@@ -321,7 +322,11 @@ def process_files(relevant_path, normalize=True, output_path='./'):
     if not relevant_path.endswith('/'):
         relevant_path += '/'
 
-    print relevant_path
+    if not output_path.endswith('/'):
+	output_path += '/'
+
+    print 'input front', relevant_path
+    print 'output to', output_path
     included_extenstions = ['jpg', 'JPG']
     file_names = [fn for fn in os.listdir(relevant_path)
                   if any(fn.endswith(ext) for ext in included_extenstions)]
