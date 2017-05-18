@@ -220,8 +220,6 @@ def extract_raw_data(file, outName, meta, no_endian, output_path):
     return 0
 
 # Extract the embedded rgb data from the FLIR thermo image to a png
-
-
 def extract_embedded_file(file, outName, dat, output_path):
     # Get Embedded Image
     if dat:
